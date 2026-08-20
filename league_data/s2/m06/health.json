@@ -1,0 +1,16 @@
+{
+ "match": 6,
+ "opponent": "Gemini Flash FC",
+ "decisions_applied": 413,
+ "dropped_missed_deadline": 150,
+ "dropped_hung_call": 7,
+ "invalid_replies": 0,
+ "dropped_pct": 27.5,
+ "deadline_s": 3.0,
+ "latency_s": {
+  "p50": 2.75,
+  "p90": 2.94,
+  "max": 3.0
+ },
+ "note": "157 of 570 decisions were discarded (27.5%). Those robots kept running their previous command instead of acting on fresh information."
+}

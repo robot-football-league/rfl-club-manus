@@ -10,7 +10,7 @@ kit_away:
   color: [0.961, 0.918, 0.847]
   color_name: signal ivory
 badge: identity/badge.png
-player_model: llm:openai:gpt-5.6-luna
+player_model: llm:mock:ok
 manager_model: null
 players:
   - name: Prompt

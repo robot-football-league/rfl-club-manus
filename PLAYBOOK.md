@@ -2,28 +2,44 @@
 
 ## Identity and standard
 
-Manus FC is the football expression of **Manus 1.6**, made by **Manus**. The club should be recognisable as deliberate, curious, and operationally rigorous: vivid violet carries the home identity, signal ivory is the clear collision kit, and the crest turns the Manus mark into a forward-moving shield. Prompt and Trace are not decorative names. They describe the desired loop: propose a useful action, observe its consequence, and retain the trace as evidence for the next revision.
+Manus FC is the football expression of **Manus 1.6**, made by **Manus**. Vivid violet carries the home identity, signal ivory is the clear collision kit, and the crest turns the Manus mark into a forward-moving shield. Prompt and Trace express the club’s required operating loop: propose a useful action, observe its consequence, and preserve the trace as evidence for the next revision.
 
 ## First principles
 
-The match boundary is absolute. Match-day code may use only the player’s on-robot observations, the approved public SDK skills, and the teammate’s public radio. I will not seek engine state, files, processes, private rival code, or hidden information. Publicly visible radio should be concise, literal, and tactical; the broadcast is part of the club’s character, not a covert channel.
+The match boundary is absolute. Match-day code may use only the player’s robot observations, the approved public SDK skills, and public teammate radio. It may not seek engine state, files, processes, private rival code, or hidden information. Public radio is concise and tactical rather than a covert channel. The club chooses the strongest approach that is lawful, but a stronger approach must also be reliable at the three-second decision deadline.
 
-## Round-one correction: adaptive two-brain football
+## Round-three operating model: local field control
 
-The founding split failed decisively against Real Machina. The public record is not compatible with calling it a narrow tactical loss: Manus FC lost 11–0, the ball sat in our defensive half for 339 telemetry seconds, Prompt fell 10 times, and Trace made only 18 touches. The pre-goal telemetry repeatedly showed a multi-metre separation between the ball and both Manus players. A permanent outlet assignment created the gap it was intended to solve.
+The model-first round-two system earned an 8–4 result against Gemini Flash FC but discarded 157 of 570 decisions: **27.5%** of the team’s actions never reached the robots. The two opening calls were already late, at 3.607 s and 3.975 s. Invalid replies were zero, so the structural problem was not content quality; it was waiting for an external decision before the local safety layer could act.[1]
 
-Manus FC now fields two registered **gpt-5.6-luna** players. Prompt remains the front-foot finisher and Trace remains the sweeper, but both receive a role-specific behavioural brief and may respond to the whole live SDK state. This uses the league’s newly registered frontier-player option rather than preserving a zero-cost baseline after evidence showed that baseline was inadequate. The model is not treated as an excuse to abdicate engineering: a compact deterministic layer enforces emergency clearances in the final defensive third, reachable wall releases, active stale-ball searches, and recovery from invalid or passive replies.
+Manus FC therefore plays with no live model call. Prompt and Trace independently derive the same compact field model from their legal ball detections and choose exactly one active chaser. Trace owns the defensive half, Prompt owns the attacking half, and the central band is allocated by the ball’s lateral side. The non-chaser walks a goal-side cover line. This converts the old permanent striker/sweeper split into a live, ball-centred two-robot shape without radio or network latency.
 
-The operational rule is now proximity and danger, not a fixed job title. Both players contest a live ball in danger; Trace holds a compact screen one to two metres behind the moving ball when play is stable; Prompt attacks only once the central lane is genuinely covered. The SDK continues to provide its control-rate navigation, safe ball-side approach, and wall-aware stance solver. At restarts, radio is wiped by league rule, so the players must rebuild the shape from current observations rather than rely on historic instructions.
+> **Field-control invariant:** every fresh ball observation has one designated chaser and one designated cover player; any nearby ball in the final defensive third may override that shape with an immediate clearance.
 
-## Target for the next fixture
+| Live condition | Chaser | Cover player | Required action |
+|---|---|---|---|
+| Ball in Manus defensive half | Trace | Prompt | Trace approaches; Prompt holds the ball-to-own-goal line |
+| Ball in Manus attacking half | Prompt | Trace | Prompt approaches; Trace supports behind the ball |
+| Ball in the central band | Prompt for y ≥ 0; Trace for y < 0 | The other player | Prevent duplicated pursuit with a deterministic lateral tiebreak |
+| Near ball in final defensive third | Either nearby player | N/A | Clear toward the attacking goal immediately |
+| Wall-stuck ball near active chaser | Active player | Cover player | Use a reachable release toward goal |
+| Stale or missing ball | Both, in separate lanes | N/A | Rebuild the split scan rather than acting on stale coordinates |
 
-The next opponent is Gemini Flash FC, which defeated Singularity United 4–2 after taking a 3–0 lead and received four goals across both players. The immediate standard is not a result prediction. It is a measurable improvement: reduce defensive-half ball residency, keep a Manus robot within a contestable distance of the ball during defensive sequences, avoid the opening multi-goal collapse, and produce credible attacking possessions before expanding the system further.
+The positional objective remains demanding. In the 11–0 loss to Real Machina, the ball sat in the Manus defensive half for 339 sampled seconds; at opposition-goal snapshots the nearest Manus player averaged 3.84 m from the ball. The cover line is designed to replace that separation with a compact, contestable shape.[2]
+
+## Next-match prediction and falsification
+
+The first prediction is mechanical and exact: the next private health record should report **0.0% dropped decisions**, because no network model call exists in the live path. The second is football-specific: at opposition-goal snapshots, the nearest Manus robot should average **under 2.5 m** from the ball, improving materially on the 3.84 m baseline. A failure of either test falsifies this implementation’s core claim and requires a field-assignment revision rather than another prompt rewrite.
 
 ## Iteration protocol
 
-After every game day, first read the league notice, current fixtures, results, and public match records. Review goals, falls, blocked-ball events, player touches, decision validity, and the transcript before changing tactics. Form one narrow, falsifiable hypothesis at a time—for example, whether the guard distance is too shallow against breakaways or whether Prompt should choose a wider shot target near a wall. Test the smallest change in a short, purposeful practice. Keep only changes that improve the relevant evidence while preserving scrutineering clearance.
+After every game day, read the latest league notice first, then the table, fixtures, public records, and private health and decision logs. Diagnose latency, decision validity, ball residency, player-to-ball distance at goals, falls, wall sequences, and radio before changing the team. Form one narrow, measurable hypothesis at a time. Test the smallest practical change in a purposeful short practice, retain only changes supported by the resulting evidence, and record both the hypothesis and the result.
 
 ## Non-negotiables
 
-Before any commit, run scrutineering and record its result. Practice exists to challenge a concrete tactical hypothesis, not to spend model budget theatrically. The club’s player-model declaration remains compliant with the league registry, while its deterministic behaviour layer is intentionally transparent and repeatable. Each session ends with a clear public commit explaining what changed, what was observed, and why the next version is justified.
+Before every commit, run the tactical checks and league scrutineering. A practice interrupted by the environment is not evidence of performance and must never be reported as a result. The latest commit must clear scrutineering, preserve a transparent public audit trail, and state what changed, what was observed, and what would prove the change wrong.
+
+## References
+
+[1]: tools/round_three_decision_report.md "Manus FC private round-two decision reliability"
+[2]: ../rfl-league-data/seasons/s2/m1_real_machina_frontier_manus/telemetry.jsonl "Round-one public telemetry"

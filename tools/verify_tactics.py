@@ -1,23 +1,6 @@
-"""Exercise Manus FC's hybrid controller against representative SDK inputs."""
+"""Exercise Manus FC's deterministic single-chaser field controller."""
 
 import team
-
-
-class StubAgent:
-    """No-network agent used to test only Manus FC's local safety rails."""
-
-    def __init__(self, reply):
-        self.reply = reply
-        self.reply_keys = None
-        self.history_n = 0
-        self.max_output = 0
-        self.system_prompt = ""
-
-    def begin_episode(self, log_dir=None):
-        return None
-
-    def decide(self, obs):
-        return self.reply
 
 
 def observation(position, ball, remaining=60.0, stuck=0.0):
@@ -30,24 +13,13 @@ def observation(position, ball, remaining=60.0, stuck=0.0):
     }
 
 
-def ball(x, y, distance, age=0.0, wall=False):
+def ball(x, y, distance, age=0.0, wall=False, speed=0.0):
     return {"field_xy": [x, y], "distance_m": distance, "age_s": age,
-            "speed_mps": 0.0, "against_wall": wall}
+            "speed_mps": speed, "against_wall": wall}
 
 
-def player(role, reply):
-    original = team.make_football_agent
-    team.make_football_agent = lambda *args, **kwargs: StubAgent(reply)
-    try:
-        instance = team.AdaptiveManusPlayer(role, 0)
-        instance.begin_episode()
-        return instance
-    finally:
-        team.make_football_agent = original
-
-
-def expect(label, instance, obs, expected):
-    reply = instance.decide(obs)
+def expect(label, player, obs, expected):
+    reply = player.decide(obs)
     actual = reply.get("skill")
     if actual != expected:
         raise AssertionError(f"{label}: expected {expected}, got {actual}")
@@ -55,22 +27,27 @@ def expect(label, instance, obs, expected):
 
 
 def main():
-    expect("Emergency clearance overrides a passive model reply",
-           player("trace", {"skill": "hold"}),
-           observation([4.1, 0.1], ball(4.3, 0.2, 0.4)), "kick_toward")
-    expect("Wall-stuck danger uses a reachable release",
-           player("prompt", {"skill": "hold"}),
-           observation([2.6, 3.8], ball(2.8, 4.0, 0.5, wall=True), stuck=2.2),
+    prompt, trace = team.build_team({"team_index": 0, "config": {}})["players"]
+    prompt.begin_episode()
+    trace.begin_episode()
+
+    expect("Prompt owns a ball in the attacking half", prompt,
+           observation([0.0, 0.0], ball(2.0, 0.8, 2.2)), "go_to_ball")
+    expect("Trace covers rather than duplicating the attacking chase", trace,
+           observation([0.0, -1.0], ball(2.0, 0.8, 2.2)), "walk_to")
+    expect("Trace owns a ball in the defensive half", trace,
+           observation([0.0, -1.0], ball(-2.0, -0.8, 2.2)), "go_to_ball")
+    expect("Prompt covers rather than duplicating the defensive chase", prompt,
+           observation([0.0, 1.0], ball(-2.0, -0.8, 2.2)), "walk_to")
+    expect("Central positive-lane ball selects Prompt as the tiebreak chaser", prompt,
+           observation([0.0, 0.0], ball(0.0, 0.3, 2.0)), "go_to_ball")
+    expect("A nearby wall case uses a controlled release", prompt,
+           observation([2.5, 3.8], ball(2.8, 4.0, 0.5, wall=True), stuck=2.0),
            "kick_toward")
-    expect("Stale ball memory triggers an active scan",
-           player("trace", {"skill": "hold"}),
-           observation([0.0, 0.0], ball(0.0, 0.0, 1.0, age=3.0)), "turn_to")
-    expect("Invalid model output falls back to active attack",
-           player("prompt", {"not": "a skill"}),
-           observation([-2.5, 1.2], ball(0.0, 0.0, 2.8)), "go_to_ball")
-    expect("Valid model play survives when no safety rail applies",
-           player("prompt", {"skill": "walk_to", "target": [1.0, 0.0]}),
-           observation([-2.5, 1.2], ball(0.0, 0.0, 2.8)), "walk_to")
+    expect("Any nearby final-third ball receives an emergency clearance", prompt,
+           observation([-4.0, 0.1], ball(-4.2, 0.2, 0.4)), "kick_toward")
+    expect("A stale ball triggers local split-search recovery", trace,
+           observation([0.0, 0.0], ball(0.0, 0.0, 1.0, age=2.0)), "walk_to")
 
 
 if __name__ == "__main__":
